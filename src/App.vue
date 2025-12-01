@@ -5,7 +5,7 @@
       <div class="container">
         <span class="navbar-brand">
           <i class="bi bi-music-note-beamed me-2"></i>
-          {{ readOnlyMode ? playlistName : 'Music List PWA' }}
+          Music List PWA
         </span>
         <div class="d-flex gap-2 align-items-center">
           <a 
