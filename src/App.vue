@@ -382,8 +382,8 @@ export default {
               album: 'Music List PWA',
               artwork: [
                 {
-                  src: 'https://foofurbot.eines.net/static/img/foofurbot-logo.png',
-                  sizes: '512x512',
+                  src: 'https://sambango.com/img/sambango_favicon_192x192.png',
+                  sizes: '192x192',
                   type: 'image/png'
                 }
               ]
@@ -684,50 +684,135 @@ export default {
 </script>
 
 <style>
-/* Estilos personalizados simples */
+/* Estilos personalizados con colores vibrantes sólidos */
 :root {
-  --purple: #6f42c1;
+  --magenta: rgb(255, 0, 112);
+  --cyan: rgb(83, 130, 255);
+  --yellow: #FFD700;
 }
 
 .bg-purple {
-  background-color: var(--purple) !important;
+  background-color: var(--magenta) !important;
 }
 
 .text-purple {
-  color: var(--purple) !important;
+  color: var(--magenta) !important;
+  font-weight: 600;
 }
 
 .btn-purple {
-  background-color: var(--purple);
-  border-color: var(--purple);
+  background-color: var(--magenta);
+  border: none;
   color: white;
+  font-weight: 600;
+  transition: all 0.2s ease;
 }
 
 .btn-purple:hover {
-  background-color: #5a32a3;
-  border-color: #5a32a3;
+  background-color: var(--cyan);
   color: white;
+  transform: translateY(-1px);
+}
+
+.btn-success {
+  background-color: var(--cyan) !important;
+  border: none !important;
+  color: white !important;
+  font-weight: 600;
+}
+
+.btn-success:hover {
+  background-color: var(--yellow) !important;
+  color: #333 !important;
 }
 
 .card {
-  border-radius: 10px;
+  border-radius: 12px;
+  border: none;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .list-group-item.active {
-  background-color: rgba(111, 66, 193, 0.1);
-  border-color: var(--purple);
-  color: var(--purple);
+  background-color: rgba(255, 0, 112, 0.1) !important;
+  border-left: 4px solid var(--magenta) !important;
+  color: var(--magenta) !important;
 }
 
 .badge.bg-purple {
-  background-color: var(--purple) !important;
+  background-color: var(--cyan) !important;
+  color: white;
 }
 
-/* Mejorar apariencia del input de URL */
+/* Inputs */
 input[type="url"]:focus,
 input[type="text"]:focus {
-  border-color: var(--purple);
-  box-shadow: 0 0 0 0.25rem rgba(111, 66, 193, 0.25);
+  border-color: var(--magenta);
+  box-shadow: 0 0 0 0.25rem rgba(255, 0, 112, 0.15);
+}
+
+/* Navbar */
+.navbar-dark.bg-purple {
+  background-color: var(--magenta) !important;
+  color: var(--yellow) !important;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Botones outline */
+.btn-outline-light {
+  border-color: rgba(255, 255, 255, 0.8) !important;
+  color: white !important;
+}
+
+.btn-outline-light:hover {
+  background-color: rgba(255, 255, 255, 0.15) !important;
+  border-color: white !important;
+  color: white !important;
+}
+
+.btn-outline-primary {
+  border-color: var(--cyan) !important;
+  color: var(--cyan) !important;
+}
+
+.btn-outline-primary:hover {
+  background-color: var(--cyan) !important;
+  color: white !important;
+}
+
+.btn-outline-secondary {
+  border-color: #ddd !important;
+  color: #666 !important;
+}
+
+.btn-outline-secondary:hover {
+  background-color: #f0f0f0 !important;
+  border-color: #ccc !important;
+  color: #333 !important;
+}
+
+.btn-outline-danger {
+  border-color: #dc3545 !important;
+  color: #dc3545 !important;
+}
+
+.btn-outline-danger:hover {
+  background-color: #dc3545 !important;
+  color: white !important;
+}
+
+/* Alert info */
+.alert-info {
+  background-color: #e7f3ff !important;
+  border-left: 4px solid var(--cyan) !important;
+  color: #004085 !important;
+  border-radius: 8px;
+}
+
+/* Card oscura */
+.card.bg-dark {
+  background-color: #2c3e50 !important;
+  border: none !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
 /* Ajustes responsivos */
