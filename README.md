@@ -8,7 +8,7 @@ Una aplicación web progresiva (PWA) para crear, compartir y reproducir listas d
 
 ## 🌐 Demo en Vivo
 
-🔗 **URL de la aplicación:** https://tuusuario.github.io/musical-list-pwa/
+🔗 **URL de la aplicación:** https://adelafoofur82.github.io/musical-list-pwa/
 
 ## ✨ Características
 
