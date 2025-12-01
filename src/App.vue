@@ -7,7 +7,15 @@
           <i class="bi bi-music-note-beamed me-2"></i>
           {{ readOnlyMode ? playlistName : 'Music List PWA' }}
         </span>
-        <div>
+        <div class="d-flex gap-2 align-items-center">
+          <a 
+            href="https://github.com/AdelaFoofur82/musical-list-pwa" 
+            target="_blank"
+            class="btn btn-sm btn-outline-light"
+            title="Ver código fuente"
+          >
+            <i class="bi bi-github"></i>
+          </a>
           <button v-if="showInstallButton" @click="installPWA" class="btn btn-sm btn-light">
             <i class="bi bi-download me-1"></i> Instalar
           </button>
