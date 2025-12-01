@@ -1,6 +1,5 @@
 # Music List PWA 🎵
 
-[![Deploy to GitHub Pages](https://github.com/tuusuario/musical-list-pwa/actions/workflows/deploy.yml/badge.svg)](https://github.com/tuusuario/musical-list-pwa/actions)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 [![PWA Ready](https://img.shields.io/badge/PWA-Ready-green.svg)](https://web.dev/progressive-web-apps/)
 
