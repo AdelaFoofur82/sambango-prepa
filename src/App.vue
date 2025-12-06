@@ -305,16 +305,35 @@
                       </button>
 
                       <!-- Archivos MP3 -->
-                      <button
+                      <div
                         v-for="item in (getCurrentFolder || []).filter(i => i.type === 'file')"
                         :key="item.url"
-                        @click="selectMp3File(item)"
-                        class="list-group-item list-group-item-action bg-dark text-white border-dark"
+                        class="list-group-item list-group-item-action bg-dark text-white border-dark d-flex justify-content-between align-items-center"
                         :class="{'active': selectedMp3?.url === item.url}"
                       >
-                        <i class="bi bi-file-music text-info me-2"></i>
-                        {{ item.title }}
-                      </button>
+                        <div @click="selectMp3File(item)" class="flex-grow-1" style="cursor: pointer;">
+                          <i class="bi bi-file-music text-info me-2"></i>
+                          {{ item.title }}
+                        </div>
+                        <div class="btn-group btn-group-sm" @click.stop>
+                          <button 
+                            v-if="previewingUrl !== item.url"
+                            @click="handlePlayPreview(item.url)"
+                            class="btn btn-outline-light"
+                            title="Preview"
+                          >
+                            <i class="bi bi-play-fill"></i>
+                          </button>
+                          <button 
+                            v-if="previewingUrl === item.url"
+                            @click="handleStopPreview()"
+                            class="btn btn-outline-danger"
+                            title="Stop Preview"
+                          >
+                            <i class="bi bi-stop-fill"></i>
+                          </button>
+                        </div>
+                      </div>
 
                       <!-- Mensaje si está vacío -->
                       <div v-if="(getCurrentFolder || []).length === 0" class="text-center text-muted py-3">
@@ -594,6 +613,7 @@ export default {
     
     // Estado para explorador de archivos Sambango
     const useUrlInput = ref(true) // true = URL manual, false = árbol
+    const previewingUrl = ref(null) // URL del archivo en preview
     const {
       sambangoTree,
       loadingSambangoTree,
@@ -617,6 +637,8 @@ export default {
       resume: resumeAudio,
       restart: restartAudio,
       playState,        // Estado único de reproducción
+      playPreview,
+      stopPreview,
       availableVoices,
       selectedVoiceIndex,
       selectedVoice,
@@ -630,6 +652,7 @@ export default {
     // Computed para compatibilidad con el template
     const isPlaying = computed(() => playState.playing && playState.type === 'audio')
     const isPlayingTTS = computed(() => playState.playing && playState.type === 'tts')
+    const isPlayingPreview = computed(() => playState.playing && playState.type === 'preview')
 
     // Computed properties
     const activePlaylist = computed(() => 
@@ -799,6 +822,18 @@ export default {
       const { url, title } = selectMp3FromTree(file)
       newSongUrl.value = url
       newSongTitle.value = title
+    }
+
+    const handlePlayPreview = async (url) => {
+      if (!audioPlayer.value || !url) return
+      previewingUrl.value = url
+      await playPreview(url, audioPlayer.value)
+    }
+
+    const handleStopPreview = () => {
+      if (!audioPlayer.value) return
+      previewingUrl.value = null
+      stopPreview(audioPlayer.value)
     }
 
     const toggleInputMode = () => {
@@ -1045,6 +1080,11 @@ export default {
     const pause = async () => {
       if (!audioPlayer.value) return
       
+      // Si estamos pausando un preview, limpiar el estado
+      if (playState.type === 'preview') {
+        previewingUrl.value = null
+      }
+      
       // Llamar al pause del composable que maneja TODO
       pauseAudio(audioPlayer.value)
       
@@ -1055,6 +1095,11 @@ export default {
     
     const play = async () => {
       if (!audioPlayer.value) return
+      
+      // Si hay preview activo, detenerlo primero
+      if (playState.type === 'preview') {
+        handleStopPreview()
+      }
       
       // Si no hay canción seleccionada, comenzar desde el principio
       if (!currentSong.value) {
@@ -1072,7 +1117,7 @@ export default {
       }
       
       // Si ya hay audio cargado y tiene src válido, reanudar
-      if (audioPlayer.value.src && audioPlayer.value.src !== '' && audioPlayer.value.currentTime > 0) {
+      if (audioPlayer.value.src && audioPlayer.value.src !== '' && audioPlayer.value.currentTime > 0 && playState.type !== 'preview') {
         try {
           playState.playing = true
           playState.type = 'audio'
@@ -1374,6 +1419,7 @@ export default {
       currentPath,
       selectedMp3,
       getCurrentFolder,
+      previewingUrl,
       
       // Estado drag and drop
       draggedIndex,
@@ -1408,6 +1454,9 @@ export default {
       
       // Métodos explorador Sambango
       selectMp3File,
+      handlePlayPreview,
+      handleStopPreview,
+      isPlayingPreview,
       handleNavigateToFolder,
       handleNavigateBack,
       handleNavigateToRoot,

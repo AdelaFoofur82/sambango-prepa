@@ -203,7 +203,7 @@ export function useAudioPlayer() {
       console.log('✅ TTS completado: ', song.title)
       
       // VERIFICAR si sigue en playing
-      if (playState.trackIndex !== trackIndex) {
+      if (playState.trackIndex !== trackIndex || !playState.playing) {
         console.log('⏹️ No es la pista actual - no continuar a audio')
         return
       }
@@ -215,7 +215,7 @@ export function useAudioPlayer() {
       await new Promise(resolve => setTimeout(resolve, 100))
 
       // Verificar de nuevo
-      if (playState.trackIndex !== trackIndex) {
+      if (playState.trackIndex !== trackIndex || !playState.playing) {
         console.log('⏹️ No es la pista actual - no reproducir después de delay')
         return
       }
@@ -224,7 +224,7 @@ export function useAudioPlayer() {
       const audioSrc = await getAudio(song.url)
       
       // Verificar antes de reproducir
-      if (playState.trackIndex !== trackIndex) {
+      if (playState.trackIndex !== trackIndex || !playState.playing) {
         console.log('⏹️ No es la pista actual - no asignar src')
         return
       }
@@ -242,7 +242,7 @@ export function useAudioPlayer() {
       }
 
       // Verificar antes de play()
-      if (playState.trackIndex !== trackIndex) {
+      if (playState.trackIndex !== trackIndex || !playState.playing) {
         console.log('⏹️ No es la pista actual - no hacer play()')
         return
       }
@@ -255,14 +255,14 @@ export function useAudioPlayer() {
       
       // Si falla TTS, reproducir solo la canción
       try {
-        if (playState.trackIndex !== trackIndex) {
+        if (playState.trackIndex !== trackIndex || !playState.playing) {
           console.log('⏹️ No es la pista actual - no continuar a audio en catch')
           return
         }
         
         const audioSrc = await getAudio(song.url)
         
-        if (playState.trackIndex !== trackIndex) {
+        if (playState.trackIndex !== trackIndex || !playState.playing) {
           console.log('⏹️ No es la pista actual - no asignar src')
           return
         }
@@ -297,6 +297,7 @@ export function useAudioPlayer() {
     
     // DETENER TODO: poner playing a false
     playState.playing = false
+    const wasPreview = playState.type === 'preview'
     playState.type = null
     
     // Cancelar TTS si está activo
@@ -306,12 +307,16 @@ export function useAudioPlayer() {
       currentSpeech = null
     }
     
-    // Pausar y vaciar audio si se proporciona
+    // Pausar audio
     if (playerElement) {
       playerElement.pause()
       console.log('🛑 Pausando audio...')
-      playerElement.src = ''
-      playerElement.load()
+      
+      // Solo vaciar src si era preview o TTS (no si es audio normal de playlist)
+      if (wasPreview) {
+        playerElement.src = ''
+        playerElement.load()
+      }
     }
   }
 
@@ -358,6 +363,80 @@ export function useAudioPlayer() {
     console.log('clearPreloadCache: No hay elementos de audio separados para limpiar')
   }
 
+  /**
+   * Reproducir preview de un archivo (sin TTS)
+   * @param {string} url - URL del audio a previsualizar
+   * @param {HTMLAudioElement} playerElement - Elemento audio principal
+   */
+  const playPreview = async (url, playerElement) => {
+    if (!url || !playerElement) {
+      console.error('playPreview: url o playerElement no proporcionados')
+      return
+    }
+
+    console.log('🎧 Reproduciendo preview:', url)
+
+    // Detener TODO antes de preview
+    if (currentSpeech && 'speechSynthesis' in window) {
+      window.speechSynthesis.cancel()
+      currentSpeech = null
+    }
+    
+    playerElement.pause()
+    playerElement.src = ''
+    playerElement.load()
+    
+    if (currentOnEndCallback) {
+      playerElement.removeEventListener('ended', currentOnEndCallback)
+      currentOnEndCallback = null
+    }
+
+    // Establecer estado de preview
+    playState.playing = true
+    playState.type = 'preview'
+    playState.trackIndex = null
+
+    try {
+      const audioSrc = await getAudio(url)
+      
+      // Verificar que sigue siendo preview
+      if (!playState.playing || playState.type !== 'preview') {
+        console.log('⏹️ Preview cancelado')
+        return
+      }
+      
+      playerElement.src = audioSrc
+      playerElement.load()
+      playerElement.currentTime = 0
+      
+      await playerElement.play()
+      console.log('▶️ Preview reproduciéndose')
+    } catch (error) {
+      console.error('❌ Error reproduciendo preview:', error)
+      playState.playing = false
+      playState.type = null
+    }
+  }
+
+  /**
+   * Detener preview
+   * @param {HTMLAudioElement} playerElement - Elemento audio principal
+   */
+  const stopPreview = (playerElement) => {
+    console.log('⏹️ Deteniendo preview')
+    
+    if (playState.type === 'preview') {
+      playState.playing = false
+      playState.type = null
+      
+      if (playerElement) {
+        playerElement.pause()
+        playerElement.src = ''
+        playerElement.load()
+      }
+    }
+  }
+
   return {
     // State
     playState,           // Estado único de reproducción
@@ -377,6 +456,8 @@ export function useAudioPlayer() {
     pause,
     resume,
     restart,
-    clearPreloadCache
+    clearPreloadCache,
+    playPreview,
+    stopPreview
   }
 }
