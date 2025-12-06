@@ -119,6 +119,14 @@
                 </div>
               </div>
               
+              <!-- Elemento de audio SIEMPRE presente (aunque oculto si no hay canciones) -->
+              <audio 
+                ref="audioPlayer"
+                controls
+                class="w-100 d-none"
+                preload="none"
+              ></audio>
+              
               <!-- Reproductor ÚNICO (visible en ambos modos) -->
               <div v-if="songs.length > 0" class="card bg-dark text-white mb-4">
                 <div class="card-body">
@@ -133,12 +141,12 @@
                       <small v-if="currentSong">{{ currentSong.title || 'Canción actual' }}</small>
                     </div>
                     
-                    <audio 
-                      ref="audioPlayer"
-                      controls
-                      class="w-100"
-                      preload="none"
-                    ></audio>
+                    <!-- Mostrar controles solo cuando hay canciones -->
+                    <div class="bg-secondary p-2 rounded mb-2" style="min-height: 54px;">
+                      <div class="text-center text-white-50 small">
+                        Controles de audio
+                      </div>
+                    </div>
                     
                     <div class="d-flex justify-content-center mt-3">
                       <button @click="playPrevious" class="btn btn-outline-light btn-sm mx-2" :disabled="!hasPrevious">
