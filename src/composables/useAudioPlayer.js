@@ -6,7 +6,8 @@ export function useAudioPlayer() {
   const playState = reactive({
     playing: false,      // Si está reproduciendo (TTS o audio)
     type: null,          // 'tts' | 'audio' | null
-    trackIndex: null     // Índice de la pista actual
+    trackIndex: null,     // Índice de la pista actual
+    restarting: false // Si está reiniciando la pista actual
   })
   
   const availableVoices = ref([])
@@ -203,7 +204,8 @@ export function useAudioPlayer() {
       console.log('✅ TTS completado: ', song.title)
       
       // VERIFICAR si sigue en playing
-      if (playState.trackIndex !== trackIndex || !playState.playing) {
+      if (playState.trackIndex !== trackIndex || !playState.playing || playState.restarting) {
+        playState.restarting = false
         console.log('⏹️ No es la pista actual - no continuar a audio')
         return
       }
@@ -215,7 +217,8 @@ export function useAudioPlayer() {
       await new Promise(resolve => setTimeout(resolve, 100))
 
       // Verificar de nuevo
-      if (playState.trackIndex !== trackIndex || !playState.playing) {
+      if (playState.trackIndex !== trackIndex || !playState.playing || playState.restarting) {
+        playState.restarting = false
         console.log('⏹️ No es la pista actual - no reproducir después de delay')
         return
       }
@@ -224,7 +227,8 @@ export function useAudioPlayer() {
       const audioSrc = await getAudio(song.url)
       
       // Verificar antes de reproducir
-      if (playState.trackIndex !== trackIndex || !playState.playing) {
+      if (playState.trackIndex !== trackIndex || !playState.playing || playState.restarting) {
+        playState.restarting = false
         console.log('⏹️ No es la pista actual - no asignar src')
         return
       }
@@ -242,7 +246,8 @@ export function useAudioPlayer() {
       }
 
       // Verificar antes de play()
-      if (playState.trackIndex !== trackIndex || !playState.playing) {
+      if (playState.trackIndex !== trackIndex || !playState.playing || playState.restarting) {
+        playState.restarting = false
         console.log('⏹️ No es la pista actual - no hacer play()')
         return
       }
@@ -255,14 +260,16 @@ export function useAudioPlayer() {
       
       // Si falla TTS, reproducir solo la canción
       try {
-        if (playState.trackIndex !== trackIndex || !playState.playing) {
+        if (playState.trackIndex !== trackIndex || !playState.playing || playState.restarting) {
+            playState.restarting = false
           console.log('⏹️ No es la pista actual - no continuar a audio en catch')
           return
         }
         
         const audioSrc = await getAudio(song.url)
         
-        if (playState.trackIndex !== trackIndex || !playState.playing) {
+        if (playState.trackIndex !== trackIndex || !playState.playing || playState.restarting) {
+            playState.restarting = false
           console.log('⏹️ No es la pista actual - no asignar src')
           return
         }
@@ -348,6 +355,8 @@ export function useAudioPlayer() {
     }
     
     console.log('🔄 Reiniciando canción:', song.title)
+
+    playState.restarting = true
     
     // Detener reproducción actual
     pause(playerElement)
