@@ -6,8 +6,8 @@
   "background_color": "#ffffff",
   "display": "standalone",
   "orientation": "portrait",
-  "scope": "/",
-  "start_url": "/",
+  "scope": "/sambango-prepa/",
+  "start_url": "/sambango-prepa/",
   "icons": [
     {
       "src": "https://sambango.com/img/sambango_favicon_192x192.png",

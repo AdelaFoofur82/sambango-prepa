@@ -7,7 +7,7 @@ Una aplicación web progresiva (PWA) para crear, compartir y reproducir listas d
 
 ## 🌐 Demo en Vivo
 
-🔗 **URL de la aplicación:** https://adelafoofur82.github.io/musical-list-pwa/
+🔗 **URL de la aplicación:** https://adelafoofur82.github.io/sambango-prepa/
 
 ## ✨ Características
 
@@ -46,8 +46,8 @@ Una aplicación web progresiva (PWA) para crear, compartir y reproducir listas d
 
 ```bash
 # Clonar repositorio
-git clone https://github.com/adelafoofur82/musical-list-pwa.git
-cd musical-list-pwa
+git clone https://github.com/adelafoofur82/sambango-prepa.git
+cd sambango-prepa
 
 # Instalar dependencias
 npm install

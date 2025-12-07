@@ -1,5 +1,5 @@
 {
-  "name": "musical-list-pwa",
+  "name": "sambango-prepa",
   "version": "1.0.0",
   "private": true,
   "type": "module",
@@ -24,7 +24,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/tuusuario/musical-list-pwa.git"
+    "url": "git+https://github.com/AdelaFoofur82/sambango-prepa.git"
   },
   "keywords": [
     "pwa",
@@ -36,7 +36,7 @@
   "author": "Tu Nombre",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/tuusuario/musical-list-pwa/issues"
+    "url": "https://github.com/AdelaFoofur82/sambango-prepa/issues"
   },
-  "homepage": "https://tuusuario.github.io/musical-list-pwa/"
+  "homepage": "https://adelafoofur82.github.io/sambango-prepa/"
 }

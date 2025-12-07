@@ -9,7 +9,7 @@
         </span>
         <div class="d-flex gap-2 align-items-center">
           <a 
-            href="https://github.com/AdelaFoofur82/sambango-prepa" 
+            href="https://github.com/AdelaFoofur82/sambango-prepa"   
             target="_blank"
             class="btn btn-sm btn-outline-light"
             title="Ver código fuente"

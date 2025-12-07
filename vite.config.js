@@ -41,7 +41,7 @@ export default defineConfig({
       }
     })
   ],
-  base: process.env.NODE_ENV === 'production' ? '/musical-list-pwa/' : '/',
+  base: process.env.NODE_ENV === 'production' ? '/sambango-prepa/' : '/',
   server: {
     host: true,
     port: 3000
