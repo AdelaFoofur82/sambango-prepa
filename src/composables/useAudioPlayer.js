@@ -295,6 +295,138 @@ export function useAudioPlayer() {
     }
   }
 
+    /**
+   * Reproducir TTS seguido del audio de la canción
+   * @param {Object} song - {title, url}
+   * @param {HTMLAudioElement} playerElement - Elemento audio principal
+   * @param {Function} onEnd - Callback cuando termina la canción
+   * @param {number} trackIndex - Índice de la pista
+   */
+  const playTrackWithoutTTS = async (song, playerElement, onEnd, trackIndex = null) => {
+    if (!song || !playerElement) {
+      console.error('playTrackWithoutTTS: song o playerElement no proporcionados')
+      return
+    }
+
+    console.log('🎵 Reproduciendo:', song.title)
+
+    // PRIMERO: DETENER TODO completamente
+    // Cancelar TTS anterior
+    if (currentSpeech && 'speechSynthesis' in window) {
+      window.speechSynthesis.cancel()
+      currentSpeech = null
+    }
+    
+    // Detener audio completamente
+    playerElement.pause()
+    playerElement.src = ''
+    playerElement.load()
+    playerElement.currentTime = 0
+    
+    // Remover el listener anterior si existe
+    if (currentOnEndCallback) {
+      playerElement.removeEventListener('ended', currentOnEndCallback)
+      currentOnEndCallback = null
+    }
+
+    // AHORA SÍ: ESTABLECER ESTADO DE REPRODUCCIÓN
+    playState.playing = true
+    playState.trackIndex = trackIndex
+
+    try {
+      // VERIFICAR si sigue en playing
+      if (playState.trackIndex !== trackIndex || !playState.playing || playState.restarting) {
+        playState.restarting = false
+        console.log('⏹️ No es la pista actual - no continuar a audio')
+        return
+      }
+      
+      // Cambiar a tipo audio
+      playState.type = 'audio'
+      
+      // Pequeña pausa
+      await new Promise(resolve => setTimeout(resolve, 100))
+
+      // Verificar de nuevo
+      if (playState.trackIndex !== trackIndex || !playState.playing || playState.restarting) {
+        playState.restarting = false
+        console.log('⏹️ No es la pista actual - no reproducir después de delay')
+        return
+      }
+
+      // Obtener URL desde caché
+      const audioSrc = await getAudio(song.url)
+      
+      // Verificar antes de reproducir
+      if (playState.trackIndex !== trackIndex || !playState.playing || playState.restarting) {
+        playState.restarting = false
+        console.log('⏹️ No es la pista actual - no asignar src')
+        return
+      }
+      
+      // Configurar el src del audio
+      console.log('🎶 Reproduciendo canción:', song.url)
+      playerElement.src = audioSrc
+      playerElement.load()
+      playerElement.currentTime = 0
+      
+      // Configurar evento de fin
+      if (onEnd) {
+        currentOnEndCallback = onEnd
+        playerElement.addEventListener('ended', currentOnEndCallback, { once: true })
+      }
+
+      // Verificar antes de play()
+      if (playState.trackIndex !== trackIndex || !playState.playing || playState.restarting) {
+        playState.restarting = false
+        console.log('⏹️ No es la pista actual - no hacer play()')
+        return
+      }
+
+      await playerElement.play()
+      console.log('▶️ Canción reproduciéndose')
+    } catch (error) {
+      console.error('❌ Error reproduciendo:', error)
+      playState.type = null
+      
+      // Si falla TTS, reproducir solo la canción
+      try {
+        if (playState.trackIndex !== trackIndex || !playState.playing || playState.restarting) {
+            playState.restarting = false
+          console.log('⏹️ No es la pista actual - no continuar a audio en catch')
+          return
+        }
+        
+        const audioSrc = await getAudio(song.url)
+        
+        if (playState.trackIndex !== trackIndex || !playState.playing || playState.restarting) {
+            playState.restarting = false
+          console.log('⏹️ No es la pista actual - no asignar src')
+          return
+        }
+        
+        playState.type = 'audio'
+        playerElement.src = audioSrc
+        playerElement.load()
+        playerElement.currentTime = 0
+        
+        if (onEnd) {
+          currentOnEndCallback = onEnd
+          playerElement.addEventListener('ended', currentOnEndCallback, { once: true })
+        }
+
+        await playerElement.play()
+        console.log('▶️ Canción reproduciéndose (sin TTS)')
+      } catch (playError) {
+        console.error('❌ Error reproduciendo canción:', playError)
+        playState.playing = false
+        playState.type = null
+        throw playError
+      }
+    }
+  }
+
+
   /**
    * Pausar reproducción (detener TODO)
    * @param {HTMLAudioElement} playerElement - Elemento audio principal (opcional)
@@ -468,6 +600,7 @@ export function useAudioPlayer() {
     preloadAudio,
     preloadTrack,
     playTrackWithTTS,
+    playTrackWithoutTTS,
     pause,
     resume,
     restart,

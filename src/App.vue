@@ -316,8 +316,8 @@
                 </h4>
 
                 <div class="list-group">
-                  <div v-for="(song, index) in songs" :key="index"
-                    class="list-group-item list-group-item-action border-start-0 border-end-0 rounded-0 cursor-pointer"
+                  <div v-for="(song, index) in songs" :key="index" role="button"
+                    class="list-group-item list-group-item-action border-start-0 border-end-0 rounded-0"
                     :class="{
                       'active': currentSongIndex === index,
                       'dragging': draggedIndex === index,
@@ -502,6 +502,7 @@ export default {
     const {
       preloadTrack,
       playTrackWithTTS,
+      playTrackWithoutTTS,
       pause: pauseAudio,
       resume: resumeAudio,
       restart: restartAudio,
@@ -1089,17 +1090,13 @@ export default {
             currentSongIndex.value
           )
         } else {
-          // Reproducir directamente sin TTS
-          try {
-            playState.playing = true
-            playState.type = 'audio'
-            playState.trackIndex = currentSongIndex.value
-            audioPlayer.value.currentTime = 0
-            audioPlayer.value.play()
-          } catch (error) {
-            console.error('Error reproduciendo pista:', error)
-          }
-        } 
+          await playTrackWithoutTTS(
+            currentSong.value,
+            audioPlayer.value,
+            () => currentSongIndex.value = null,
+            currentSongIndex.value
+          )
+        }
 
         if ('mediaSession' in navigator) {
           navigator.mediaSession.playbackState = 'playing'
