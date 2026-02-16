@@ -41,7 +41,7 @@ export default defineConfig({
       }
     })
   ],
-  base: process.env.NODE_ENV === 'production' ? '/sambango-prepa/' : '/',
+  base: process.env.NODE_ENV === 'production' ? './' : '/',
   server: {
     host: true,
     port: 3000

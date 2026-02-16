@@ -6,8 +6,8 @@
   "background_color": "#ffffff",
   "display": "standalone",
   "orientation": "portrait",
-  "scope": "/sambango-prepa/",
-  "start_url": "/sambango-prepa/",
+  "scope": "./",
+  "start_url": "./",
   "icons": [
     {
       "src": "https://sambango.com/img/sambango_favicon_192x192.png",
@@ -16,7 +16,7 @@
     }
   ],
   "share_target": {
-    "action": "/",
+    "action": "./",
     "method": "GET",
     "enctype": "application/x-www-form-urlencoded",
     "params": {
@@ -27,7 +27,7 @@
   },
   "file_handlers": [
     {
-      "action": "/",
+      "action": "./",
       "accept": {
         "audio/*": [".mp3", ".wav", ".ogg", ".m4a", ".flac"]
       }
