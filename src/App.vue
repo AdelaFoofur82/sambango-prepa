@@ -89,9 +89,14 @@
                     <i class="bi bi-eye me-2"></i>
                     Estás viendo una lista compartida (solo reproducción)
                   </span>
-                  <button @click="exitReadOnlyMode" class="btn btn-sm btn-outline-primary">
-                    <i class="bi bi-pencil me-1"></i> Crear mi propia lista
-                  </button>
+                  <div class="d-flex gap-2">
+                    <button @click="saveSharedPlaylist" class="btn btn-sm btn-outline-success">
+                      <i class="bi bi-bookmark-plus me-1"></i> Guardar en mis listas
+                    </button>
+                    <button @click="exitReadOnlyMode" class="btn btn-sm btn-outline-primary">
+                      <i class="bi bi-pencil me-1"></i> Crear mi propia lista
+                    </button>
+                  </div>
                 </div>
               </div>
 
@@ -1161,13 +1166,66 @@ export default {
       }
     }
 
+    const createEditableCopyFromShared = (sharedPlaylist, targetPlaylists) => {
+      const baseName = sharedPlaylist?.name || 'Lista Compartida'
+      const existingNames = new Set((targetPlaylists || []).map(p => p.name))
+
+      let copyName = `Copia de ${baseName}`
+      let copyIndex = 2
+      while (existingNames.has(copyName)) {
+        copyName = `Copia ${copyIndex} de ${baseName}`
+        copyIndex++
+      }
+
+      return {
+        id: Date.now(),
+        name: copyName,
+        songs: Array.isArray(sharedPlaylist?.songs)
+          ? sharedPlaylist.songs.map(song => ({ ...song }))
+          : []
+      }
+    }
+
+    const importSharedPlaylistToUserLists = (sharedPlaylist) => {
+      if (!sharedPlaylist || !Array.isArray(sharedPlaylist.songs) || sharedPlaylist.songs.length === 0) {
+        showToast('No hay canciones para importar', 'warning')
+        return false
+      }
+
+      const editableCopy = createEditableCopyFromShared(sharedPlaylist, playlists.value)
+      playlists.value.push(editableCopy)
+      activePlaylistId.value = editableCopy.id
+      currentSongIndex.value = 0
+      saveToStorage()
+      return true
+    }
+
+    const saveSharedPlaylist = () => {
+      if (!readOnlyMode.value) return
+
+      const sharedPlaylist = activePlaylist.value
+      const imported = importSharedPlaylistToUserLists(sharedPlaylist)
+
+      if (imported) {
+        showToast('Lista compartida guardada en tus listas', 'success')
+      }
+    }
+
     const exitReadOnlyMode = () => {
+      const sharedPlaylist = activePlaylist.value
+
       readOnlyMode.value = false
       // Limpiar URL
       window.history.replaceState({}, document.title, window.location.pathname)
       // Cargar playlists guardadas
       loadFromStorage()
-      showToast('Ahora puedes editar tus listas', 'success')
+
+      // Importar una copia editable de la lista compartida
+      if (importSharedPlaylistToUserLists(sharedPlaylist)) {
+        showToast('Lista compartida importada para editar y copiar', 'success')
+      } else {
+        showToast('Ahora puedes editar tus listas', 'success')
+      }
     }
 
     const installPWA = async () => {
@@ -1345,6 +1403,7 @@ export default {
       playIndex,
       copyShareLink,
       clearPlaylist,
+      saveSharedPlaylist,
       exitReadOnlyMode,
       installPWA,
 
